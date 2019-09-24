@@ -1,0 +1,7 @@
+prop_a: "value_a"
+prop_b:
+    prop_c: "value_c"
+prop_d:
+  -  "value_d0"
+  -  "value_d1"
+  -  "value_d2"
