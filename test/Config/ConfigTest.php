@@ -33,6 +33,7 @@ class ConfigTest extends TestCase
     public function test_toml()
     {
         $config = Config::load(__DIR__.DIRECTORY_SEPARATOR.'config.toml');
+        $this->assertNotNull($config->getValue());
         $this->assertEquals('VALUE_FOR_TEST1', $config->getValue('TEST1'));
         $this->assertEquals('VALUE_FOR_TEST2', $config->getValue('TEST2'));
         $this->assertEquals('', $config->getValue('TEST3'));
@@ -41,6 +42,7 @@ class ConfigTest extends TestCase
     public function test_json()
     {
         $config = Config::load(__DIR__.DIRECTORY_SEPARATOR.'config.json');
+        $this->assertNotNull($config->getValue());
         $this->assertEquals('value_a', $config->getValue('prop_a'));
         $this->assertEquals('value_c', $config->getValue('prop_b.prop_c'));
         $this->assertEquals('value_d2', $config->getValue('prop_d[2]'));
@@ -49,6 +51,7 @@ class ConfigTest extends TestCase
     public function test_yaml()
     {
         $config = Config::load(__DIR__.DIRECTORY_SEPARATOR.'config.yaml');
+        $this->assertNotNull($config->getValue());
         $this->assertEquals('value_a', $config->getValue('prop_a'));
         $this->assertEquals('value_c', $config->getValue('prop_b.prop_c'));
         $this->assertEquals('value_d2', $config->getValue('prop_d[2]'));

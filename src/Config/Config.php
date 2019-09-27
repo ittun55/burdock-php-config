@@ -42,7 +42,7 @@ class Config
         return $config;
     }
 
-    public function getValue(string $path, string $delimiter='.')
+    public function getValue(?string $path=null, string $delimiter='.')
     {
         if (is_null($path)) {
             return $this->_data;
