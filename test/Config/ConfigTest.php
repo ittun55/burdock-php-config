@@ -56,4 +56,10 @@ class ConfigTest extends TestCase
         $this->assertEquals('value_c', $config->getValue('prop_b.prop_c'));
         $this->assertEquals('value_d2', $config->getValue('prop_d[2]'));
     }
+
+    public function test_notExists()
+    {
+        $this->expectException('\InvalidArgumentException');
+        $config = Config::load(__DIR__.DIRECTORY_SEPARATOR.'aaa.yaml');
+    }
 }

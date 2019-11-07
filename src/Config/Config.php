@@ -9,6 +9,8 @@ use Psr\Log\LoggerInterface;
 
 class Config
 {
+    const INI  = 'ini';
+    const YML  = 'yml';
     const YAML = 'yaml';
     const JSON = 'json';
     const TOML = 'toml';
@@ -26,18 +28,25 @@ class Config
 
     public static function load(string $path=null, string $type=null)
     {
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException($path . ' not found. Please specify existing file.');
+        }
+        if (!$file = file_get_contents($path)) {
+            throw new \InvalidArgumentException($path . ' could not read. Please confirm access rights.');
+        };
         $config = new static();
         if (self::YAML === substr($path, -1 * strlen(self::YAML)) || $type == self::YAML) {
-            $yaml = file_get_contents($path);
-            $config->_data = Yaml::parse($yaml);
+            $config->_data = Yaml::parse($file);
+        } elseif (self::YML === substr($path, -1 * strlen(self::YML)) || $type == self::YML) {
+            $config->_data = Yaml::parse($file);
         } elseif (self::JSON === substr($path,-1 * strlen(self::JSON)) || $type == self::JSON) {
-            $json = file_get_contents($path);
-            $config->_data = json_decode($json, true);
+            $config->_data = json_decode($file, true);
+        } elseif (self::INI === substr($path,-1 * strlen(self::INI)) || $type == self::INI) {
+            $config->_data = Toml::Parse($file);
         } elseif (self::TOML === substr($path,-1 * strlen(self::TOML)) || $type == self::TOML) {
-            $toml = file_get_contents($path);
-            $config->_data = Toml::Parse($toml);
+            $config->_data = Toml::Parse($file);
         } else {
-            throw new \InvalidArgumentException('Please specify valid config file type');
+            throw new \InvalidArgumentException('Please specify valid config file type. .yaml .json .toml');
         }
         return $config;
     }
