@@ -51,6 +51,46 @@ class Config
         return $config;
     }
 
+    public function setValue(string $path, $obj, string $delimiter='.')
+    {
+        $nodes = explode($delimiter, $path);
+        $value = &$this->_data;
+        for ($i=0; $i < count($nodes); $i++) {
+            $node = $nodes[$i];
+            if ($i == count($nodes) - 1) {
+                if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d*)\]/', $node, $matches)) {
+                    $prop = $matches['prop'];
+                    if (!array_key_exists($prop, $value))
+                        $value[$prop] = [];
+                    if ('' === $matches['idx']) {
+                        $value[$prop][] = $obj;
+                    } else {
+                        $idx = (int)$matches['idx'];
+                        $value[$prop][$idx] = $obj;
+                    }
+                } else {
+                    $value[$node] = $obj;
+                }
+            } else {
+                if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d+)\]/', $node, $matches)) {
+                    $prop = $matches['prop'];
+                    if (!array_key_exists($prop, $value))
+                        $value[$prop] = [];
+                    if ('' === $matches['idx']) {
+                        $len = count($value[$prop]);
+                        $value[$prop][] = [];
+                        $value = &$value[$prop][$len];
+                    } else {
+                        $idx = (int)$matches['idx'];
+                        $value = &$value[$prop][$idx];
+                    }
+                } else {
+                    $value = &$value[$node];
+                }
+            }
+        }
+    }
+
     public function getValue(?string $path=null, string $delimiter='.')
     {
         if (is_null($path)) {
@@ -60,7 +100,7 @@ class Config
             $value = $this->_data;
             foreach ($nodes as $node) {
                 if ($node === '') continue;
-                if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d+)\]/', $node, $matches)) {
+                if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d*)\]/', $node, $matches)) {
                     $prop = $matches['prop'];
                     $idx  = (int)$matches['idx'];
                     if (!array_key_exists($prop, $value) || !array_key_exists($idx, $value[$prop])) {

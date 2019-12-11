@@ -3,7 +3,6 @@
 use Burdock\Config\Config;
 use PHPUnit\Framework\TestCase;
 
-
 class ConfigTest extends TestCase
 {
     public function test_construct()
@@ -28,6 +27,23 @@ class ConfigTest extends TestCase
         ]);
         $this->assertEquals('abc', $config->getValue('TEST3.key1[0].ABC'));
         $this->assertEquals('XYZ', $config->getValue('TEST3.key1[1]'));
+        $this->assertIsArray($config->getValue('TEST3.key1[]'));
+    }
+
+    public function test_setValue()
+    {
+        $config = new Config([
+            'TEST3' => [
+                'key1' => [
+                    ['ABC' => 'abc'],
+                    'XYZ',
+                ]
+            ],
+        ]);
+        $config->setValue('TEST3.key1[]', 'ABC');
+        $this->assertEquals('ABC', $config->getValue('TEST3.key1[2]'));
+        $config->setValue('TEST3.key1[0].ABC', 'ABC');
+        $this->assertEquals('ABC', $config->getValue('TEST3.key1[0].ABC'));
     }
 
     public function test_toml()
