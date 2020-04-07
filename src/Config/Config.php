@@ -91,31 +91,41 @@ class Config
         }
     }
 
+    public function hasValue(?string $path=null, string $delimiter='.')
+    {
+        if (is_null($path)) return true;
+        try {
+            $this->getValue($path, $delimiter);
+            return true;
+        } catch (\OutOfRangeException $e) {
+            return false;
+        }
+    }
+
     public function getValue(?string $path=null, string $delimiter='.')
     {
-        if (is_null($path)) {
-            return $this->_data;
-        } else {
-            $nodes = explode($delimiter, $path);
-            $value = $this->_data;
-            foreach ($nodes as $node) {
-                if ($node === '') continue;
-                if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d*)\]/', $node, $matches)) {
-                    $prop = $matches['prop'];
-                    $idx  = (int)$matches['idx'];
-                    if (!array_key_exists($prop, $value) || !array_key_exists($idx, $value[$prop])) {
-                        throw new \OutOfRangeException('The config has no value for '.$path);
-                    }
-                    $value = $value[$prop][$idx];
-                } else {
-                    if (!array_key_exists($node, $value)) {
-                        throw new \OutOfRangeException('The config has no value for '.$path);
-                    }
-                    $value = $value[$node];
+        if (is_null($path)) return $this->_data;
+
+        $nodes = explode($delimiter, $path);
+        $value = $this->_data;
+
+        foreach ($nodes as $node) {
+            if ($node === '') continue;
+            if (preg_match('/(?P<prop>\w+)\[(?P<idx>\d*)\]/', $node, $matches)) {
+                $prop = $matches['prop'];
+                $idx  = (int)$matches['idx'];
+                if (!array_key_exists($prop, $value) || !array_key_exists($idx, $value[$prop])) {
+                    throw new \OutOfRangeException('The config has no value for '.$path);
                 }
+                $value = $value[$prop][$idx];
+            } else {
+                if (!array_key_exists($node, $value)) {
+                    throw new \OutOfRangeException('The config has no value for '.$path);
+                }
+                $value = $value[$node];
             }
-            return $value;
         }
+        return $value;
     }
 
     public function setLogger(LoggerInterface $logger): void

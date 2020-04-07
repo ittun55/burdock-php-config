@@ -46,6 +46,23 @@ class ConfigTest extends TestCase
         $this->assertEquals('ABC', $config->getValue('TEST3.key1[0].ABC'));
     }
 
+    public function test_hasValue()
+    {
+        $config = new Config([
+            'TEST3' => [
+                'key1' => [
+                    ['ABC' => 'abc'],
+                    'XYZ',
+                ]
+            ],
+        ]);
+        $this->assertTrue($config->hasValue());
+        $this->assertTrue($config->hasValue('TEST3.key1[]'));
+        $this->assertTrue($config->hasValue('TEST3.key1[0].ABC'));
+        $this->assertFalse($config->hasValue('TEST3.key1[0].XYZ'));
+        $this->assertFalse($config->hasValue('TEST3.key1.ABC'));
+    }
+
     public function test_toml()
     {
         $config = Config::load(__DIR__.DIRECTORY_SEPARATOR.'config.toml');
